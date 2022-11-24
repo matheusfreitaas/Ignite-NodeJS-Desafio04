@@ -1,0 +1,269 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Rocketseat SOLID Challenge Documentation",
+    "description": "Rocketseat Ignite Node project doc",
+    "version": "1.0.0"
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "required": "true",
+            "format": "byte"
+          },
+          "admin": {
+            "type": "boolean",
+            "default": "false"
+          },
+          "email": {
+            "type": "string",
+            "required": "true",
+            "format": "email"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Error": {
+        "type": "string",
+        "format": "byte"
+      }
+    }
+  },
+  "paths": {
+    "/users": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Create a new user",
+        "requestBody": {
+          "description": "Mandatory fields for user creation",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "required": "true"
+                  },
+                  "email": {
+                    "type": "string",
+                    "required": "true",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created with success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Couldn't create user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Email already registered"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get users registered",
+        "description": "Return all users registered on system. User must be administrator to use this route.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "user_id",
+            "description": "The ID of the user who requested the listing of registered users",
+            "required": "true",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Users retrieved with success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Couldn't retrieve registered users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "NotAdmin": {
+                    "value": {
+                      "error": "User isn't administrator"
+                    }
+                  },
+                  "NoUser": {
+                    "value": {
+                      "error": "User doesn't exist."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{user_id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get user information",
+        "description": "Returns the user's own information",
+        "parameters": [
+          {
+            "in": "params",
+            "name": "user_id",
+            "description": "ID of the user who requested access to his information",
+            "required": "true",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User retrieved with success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Couldn't retrieve user information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "NoUser": {
+                    "value": {
+                      "error": "User doesn't exist."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "users/{user_id}/admin": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Turn a user into administrator",
+        "description": "Turn a user into administrator",
+        "parameters": [
+          {
+            "in": "params",
+            "name": "user_id",
+            "description": "The ID of the user to be turned into administrator",
+            "required": "true",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User turned administrator with success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/User"
+                },
+                "example": {
+                  "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "name": "my name",
+                  "admin": true,
+                  "email": "user@example.com",
+                  "created_at": "2022-11-24T12:59:22.222Z",
+                  "updated_at": "2022-11-24T12:59:22.222Z"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Couldn't turn user into administrator.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "NoUser": {
+                    "value": {
+                      "error": "User doesn't exist."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
